@@ -18,25 +18,28 @@ body{font-family:Arial,sans-serif;background:#f1f5f9}
 </header>
 
 <main class="max-w-4xl mx-auto p-4">
-<!-- ADD -->
 <div class="bg-white rounded-2xl shadow-lg p-6 border mb-6">
 <h2 class="text-xl font-extrabold text-emerald-900 mb-4">➕ أضف همّاً جديداً</h2>
 
-<!-- 1 SEARCH -->
-<label class="block text-sm font-bold mb-1">1 - ابحث عن همّك 🔍</label>
-<input type="text" id="worrySearch" oninput="onSearch()" onfocus="showAll()" placeholder="اكتب هنا... مثال: المال، الصحة، العمل، العائلة..." autocomplete="off"
-class="w-full border-2 border-emerald-600 rounded-xl px-4 py-3 outline-none" />
-<div id="suggestions" class="border rounded-xl mt-1 bg-white shadow hidden max-h-60 overflow-y-auto"></div>
-<p class="text-xs text-slate-500 mt-1">ابدأ الكتابة، ستظهر لك الاقتراحات. مثال: المال، الصحة، العائلة، العمل، الحب، الدراسة، المستقبل...</p>
+<!-- 1 - الهم الرئيسي -->
+<label class="block text-sm font-bold mb-1">1 - اختر الهمّ الرئيسي 🔍</label>
+<select id="worrySelect" onchange="onWorrySelect()" class="w-full border-2 border-emerald-600 rounded-xl px-4 py-3 outline-none bg-white font-bold">
+<option value="">-- اختر الهمّ من هنا ▼ --</option>
+</select>
 
-<!-- 2 DROPDOWN DETAILS -->
+<input type="text" id="worrySearch" oninput="onSearch()" onfocus="showAll()" placeholder="أو اكتب هنا للبحث... مثال: المال، الصحة، العمل..." autocomplete="off"
+class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none mt-2" />
+<div id="suggestions" class="border rounded-xl mt-1 bg-white shadow hidden max-h-60 overflow-y-auto"></div>
+<p class="text-xs text-slate-500 mt-1">اختر من القائمة المنسدلة، أو اكتب وسيظهر لك الاقتراح.</p>
+
+<!-- 2 - التفاصيل حسب الهم -->
 <label class="block text-sm font-bold mb-1 mt-4">2 - اختر تفاصيل هذا الهمّ ▼</label>
 <select id="detailSelect" class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none bg-white">
-<option value="">-- اختر همّاً من الأعلى أولاً --</option>
+<option value="">-- أولاً اختر الهمّ من الأعلى --</option>
 </select>
 <input type="text" id="customDetail" placeholder="✍️ أو اكتب تفصيلك الخاص هنا..." class="hidden mt-2 w-full border-2 border-amber-400 bg-amber-50 rounded-xl px-4 py-3 outline-none" />
 
-<!-- 3 NOTES -->
+<!-- 3 - ملاحظات -->
 <label class="block text-sm font-bold mb-1 mt-4">3 - ملاحظات إضافية</label>
 <textarea id="notes" rows="3" placeholder="اكتب ما يدور في ذهنك... مثال: يجب أن أدفع الكراء قبل يوم الجمعة..." class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none"></textarea>
 
@@ -64,14 +67,134 @@ class="w-full border-2 border-emerald-600 rounded-xl px-4 py-3 outline-none" />
 <div class="bg-white rounded-2xl shadow-lg p-6 border">
 <div class="flex justify-between"><h3 class="font-extrabold text-emerald-900">📋 قائمة همومي</h3><span id="countLabel" class="text-xs bg-emerald-100 px-3 py-1 rounded-full font-bold"></span></div>
 <div id="tasksList" class="space-y-4 mt-4"></div>
-<div id="emptyMsg" class="text-center py-10 text-slate-400"><div class="text-5xl mb-3">🌿</div><p class="font-bold">ذهنك صافٍ الآن</p><p class="text-sm">اكتب همّاً في الأعلى واحفظه</p></div>
+<div id="emptyMsg" class="text-center py-10 text-slate-400"><div class="text-5xl mb-3">🌿</div><p class="font-bold">ذهنك صافٍ الآن</p><p class="text-sm">اختر همّاً من الأعلى واحفظه</p></div>
 </div>
 </main>
 
 <script>
-// ===== قاعدة بيانات الهموم بالعربية =====
+// ===== قاعدة بيانات الهموم بالعربية - كل همّ مقابله تفاصيله =====
 const DATA = {
-"المال": ["دفع الكراء","دفع الفواتير","دفع الديون","ادخار المال","المصاريف اليومية","شراء الطعام","مصاريف السيارة","مصروف غير متوقع","راتب ضعيف","بدون عمل"],
-"الصحة": ["صداع","ألم في الظهر","الشعور بالتعب","موعد الطبيب","أخذ الدواء","الحاجة للرياضة","مشاكل النوم","القلق","التوتر","ألم الأسنان"],
-"العائلة": ["أطفالي","زوجتي / زوجي","والداي","زيارة عائلية","مشكلة عائلية","دراسة الأطفال","صحة الأطفال","مناسبة عائلية","رعاية الوالدين"],
-"العمل": ["تحضير الدرس","تصحيح الامتحانات","اجتماع مع المدير","موعد نهائي للعمل","ضغط العمل","مشروع جديد","التحدث مع زميل","وثائق العمل","التر
+"المال": ["دفع الكراء","دفع الفواتير","دفع الديون","ادخار المال","المصاريف اليومية","شراء الطعام","مصاريف السيارة","مصروف غير متوقع","راتب ضعيف","بدون عمل","الضرائب","التأمين"],
+"الصحة": ["صداع","ألم في الظهر","الشعور بالتعب","موعد الطبيب","أخذ الدواء","الحاجة للرياضة","مشاكل النوم","القلق","التوتر","ألم الأسنان","الحمية","إنقاص الوزن","الصحة النفسية","الاكتئاب"],
+"العائلة": ["أطفالي","زوجتي / زوجي","والداي","زيارة عائلية","مشكلة عائلية","دراسة الأطفال","صحة الأطفال","مناسبة عائلية","رعاية الوالدين","التربية"],
+"العمل": ["تحضير الدرس","تصحيح الامتحانات","اجتماع مع المدير","موعد نهائي للعمل","ضغط العمل","مشروع جديد","التحدث مع زميل","وثائق العمل","الترقية","البحث عن عمل"],
+"الدراسة": ["الواجبات المنزلية","التحضير للامتحان","تعلم الإنجليزية","التسجيل في الجامعة","قراءة الكتب","دورة عبر الإنترنت","عرض تقديمي","رسوم الدراسة"],
+"الحب والزواج": ["إيجاد شريك","مشاكل الزواج","سوء تفاهم","الحاجة للتواصل","التخطيط للزواج","الغيرة","الشعور بالوحدة","الطلاق"],
+"المنزل": ["تنظيف المنزل","المطبخ","شراء الأثاث","إصلاح شيء ما","الانتقال لمنزل جديد","الحديقة","التسوق للمنزل","الغسيل"],
+"الأصدقاء والمجتمع": ["الاتصال بصديق","زيارة صديق","مناسبة اجتماعية","سوء تفاهم مع صديق","الشعور بالعزلة","مساعدة صديق","الجيران"],
+"الروحانيات / الدين": ["الصلاة","قراءة القرآن","الدعاء","الصدقة","الصيام","الشعور بالبعد عن الله","المغفرة","الحزن","الموت"],
+"المستقبل": ["الخوف من المستقبل","اختيار المهنة","السفر للخارج","شراء منزل","بدء مشروع","التقاعد","عدم اليقين","التفكير الزائد"],
+"السيارة والسفر": ["إصلاح السيارة","أوراق السيارة","رخصة السياقة","حجز السفر","جواز السفر","تذكرة الطائرة","حجز الفندق"],
+"التكنولوجيا": ["مشكلة في الهاتف","مشكلة في الحاسوب","مشكلة في الإنترنت","نسيت كلمة السر","تطبيق لا يعمل","نسخ احتياطي للصور"],
+"أخرى": ["اكتب همّي الخاص...","التسويف","إدارة الوقت","الثقة بالنفس","التحفيز","العادات","الطبخ","التسوق","الحيوانات الأليفة","الأمان"]
+};
+
+let ALL_WORRIES = Object.keys(DATA);
+let tasks = [];
+try{ tasks = JSON.parse(localStorage.getItem('myauto_tasks_v2')||'[]'); }catch(e){ tasks=[]; }
+let currentFilter='all';
+let selectedWorry='';
+
+// تعبئة القائمة المنسدلة الأولى بالهموم
+function fillWorrySelect(){
+  let sel = document.getElementById('worrySelect');
+  sel.innerHTML = '<option value="">-- اختر الهمّ من هنا ▼ --</option>' + ALL_WORRIES.map(w=>`<option value="${w}">${w}</option>`).join('');
+}
+fillWorrySelect();
+
+function onWorrySelect(){
+  let w = document.getElementById('worrySelect').value;
+  if(!w) return;
+  document.getElementById('worrySearch').value = w;
+  selectedWorry = w;
+  updateDetails(w);
+}
+
+function showAll(){
+  renderSuggestions('');
+  document.getElementById('suggestions').classList.remove('hidden');
+}
+function onSearch(){
+  let v=document.getElementById('worrySearch').value.trim();
+  renderSuggestions(v);
+  document.getElementById('suggestions').classList.remove('hidden');
+  if(v.length>1){ selectedWorry=v; updateDetails(v); 
+    // مزامنة مع القائمة المنسدلة
+    let sel=document.getElementById('worrySelect');
+    if(ALL_WORRIES.includes(v)) sel.value=v;
+  }
+}
+function renderSuggestions(q){
+  let box=document.getElementById('suggestions');
+  let list = ALL_WORRIES.filter(w=> w.includes(q)).slice(0,30);
+  if(list.length===0 && q) list=[q];
+  box.innerHTML = list.map(w=>`<div class="sug px-4 py-2 border-b text-sm font-bold" onclick="pickWorry('${w.replace(/'/g,"")}')">${w}</div>`).join('');
+}
+function pickWorry(w){
+  document.getElementById('worrySearch').value=w;
+  document.getElementById('worrySelect').value = ALL_WORRIES.includes(w) ? w : "";
+  selectedWorry=w;
+  document.getElementById('suggestions').classList.add('hidden');
+  updateDetails(w);
+}
+
+// ===== هنا السر: كل همّ كيعطي التفاصيل ديالو =====
+function updateDetails(worry){
+  let sel=document.getElementById('detailSelect');
+  let details = DATA[worry] || ["مشكلة عامة","أحتاج إلى حل","أحتاج إلى تخطيط","أحتاج إلى التحدث","أحتاج إلى مال","أحتاج إلى وقت","مستعجل","غير مستعجل","اكتب تفصيلي الخاص..."];
+  sel.innerHTML='<option value="">-- اختر التفاصيل --</option>' + details.map(d=>`<option value="${d}">${d}</option>`).join('') + '<option value="__custom__">✍️ اكتب تفصيلي الخاص...</option>';
+  sel.onchange=function(){
+    let c=document.getElementById('customDetail');
+    if(sel.value==='__custom__') c.classList.remove('hidden'); else c.classList.add('hidden');
+  };
+}
+
+function save(){
+  try{ localStorage.setItem('myauto_tasks_v2', JSON.stringify(tasks)); }catch(e){}
+  render();
+}
+function addTask(){
+  let worry=document.getElementById('worrySearch').value.trim() || document.getElementById('worrySelect').value;
+  if(!worry){ alert('من فضلك اختر همّاً أولاً 🔍'); return; }
+  let detail=document.getElementById('detailSelect').value;
+  if(detail==='__custom__'){ detail=document.getElementById('customDetail').value.trim(); if(!detail){ alert('من فضلك اكتب التفاصيل'); return; } }
+  if(!detail){ alert('من فضلك اختر التفاصيل من القائمة ▼'); return; }
+  let notes=document.getElementById('notes').value.trim();
+  tasks.unshift({id:Date.now(), worry, detail, notes, done:false, date:new Date().toLocaleDateString('ar-MA')});
+  save();
+  let m=document.getElementById('saveMsg'); m.classList.remove('hidden');
+  setTimeout(()=>m.classList.add('hidden'),2000);
+  clearInputs();
+  alert('✅ تم الحفظ: '+worry+' - '+detail);
+}
+function clearInputs(){
+  document.getElementById('worrySearch').value='';
+  document.getElementById('worrySelect').value='';
+  document.getElementById('detailSelect').innerHTML='<option value="">-- أولاً اختر الهمّ من الأعلى --</option>';
+  document.getElementById('customDetail').value=''; document.getElementById('customDetail').classList.add('hidden');
+  document.getElementById('notes').value='';
+  document.getElementById('suggestions').classList.add('hidden');
+}
+function toggleDone(id){ tasks=tasks.map(t=>t.id===id?{...t,done:!t.done}:t); save(); }
+function deleteTask(id){ if(!confirm('حذف هذا الهمّ؟')) return; tasks=tasks.filter(t=>t.id!==id); save(); }
+function deleteAll(){ if(!confirm('حذف الكل؟')) return; tasks=[]; save(); }
+function filterTasks(f){ currentFilter=f; render(); }
+function render(){
+  let list=document.getElementById('tasksList');
+  let empty=document.getElementById('emptyMsg');
+  let filtered=tasks.filter(t=> currentFilter==='all'?true: currentFilter==='done'?t.done:!t.done);
+  document.getElementById('countLabel').textContent=`المجموع: ${tasks.length} | تم: ${tasks.filter(t=>t.done).length} | قيد الانتظار: ${tasks.filter(t=>!t.done).length}`;
+  if(filtered.length===0){ list.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.innerHTML=filtered.map(t=>`
+  <div class="border rounded-xl p-4 ${t.done?'bg-emerald-50':'bg-white'}">
+  <div class="flex justify-between"><div><span class="text-xs font-bold bg-teal-900 text-white px-2 py-1 rounded-full">${t.worry}</span> <span class="text-xs font-bold bg-amber-100 px-2 py-1 rounded-full">${t.detail}</span> <span class="text-xs text-slate-400">${t.date}</span></div><span class="text-sm font-bold ${t.done?'text-emerald-700':'text-amber-600'}">${t.done?'✅ تم':'⏳ قيد الانتظار'}</span></div>
+  <p class="mt-2">${t.notes||'(بدون ملاحظات)'}</p>
+  <div class="mt-3 flex gap-2"><button onclick="toggleDone(${t.id})" class="text-sm font-bold px-4 py-2 rounded-lg ${t.done?'bg-amber-500 text-white':'bg-emerald-600 text-white'}">${t.done?'↩️ تراجع':'✅ تحديد كتم'}</button><button onclick="deleteTask(${t.id})" class="text-sm font-bold px-4 py-2 rounded-lg bg-rose-100 text-rose-700">🗑️ حذف</button></div>
+  </div>`).join('');
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('#worrySearch') && !e.target.closest('#suggestions')) document.getElementById('suggestions').classList.add('hidden'); });
+render();
+</script>
+</body>
+</html>
