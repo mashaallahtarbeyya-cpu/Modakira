@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyAutoAssistant - صفّي ذهنك</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{font-family:Arial,sans-serif;background:#f1f5f9}
+.sug{cursor:pointer}
+.sug:hover{background:#ecfdf5}
+</style>
+</head>
+<body>
+<header class="bg-teal-900 text-white py-6 text-center">
+<h1 class="text-2xl font-extrabold">📖 MyAutoAssistant</h1>
+<p class="text-sm text-emerald-100">اكتب همّك، اختر التفاصيل، احفظه وصفّي ذهنك</p>
+</header>
+
+<main class="max-w-4xl mx-auto p-4">
+<!-- ADD -->
+<div class="bg-white rounded-2xl shadow-lg p-6 border mb-6">
+<h2 class="text-xl font-extrabold text-emerald-900 mb-4">➕ أضف همّاً جديداً</h2>
+
+<!-- 1 SEARCH -->
+<label class="block text-sm font-bold mb-1">1 - ابحث عن همّك 🔍</label>
+<input type="text" id="worrySearch" oninput="onSearch()" onfocus="showAll()" placeholder="اكتب هنا... مثال: المال، الصحة، العمل، العائلة..." autocomplete="off"
+class="w-full border-2 border-emerald-600 rounded-xl px-4 py-3 outline-none" />
+<div id="suggestions" class="border rounded-xl mt-1 bg-white shadow hidden max-h-60 overflow-y-auto"></div>
+<p class="text-xs text-slate-500 mt-1">ابدأ الكتابة، ستظهر لك الاقتراحات. مثال: المال، الصحة، العائلة، العمل، الحب، الدراسة، المستقبل...</p>
+
+<!-- 2 DROPDOWN DETAILS -->
+<label class="block text-sm font-bold mb-1 mt-4">2 - اختر تفاصيل هذا الهمّ ▼</label>
+<select id="detailSelect" class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none bg-white">
+<option value="">-- اختر همّاً من الأعلى أولاً --</option>
+</select>
+<input type="text" id="customDetail" placeholder="✍️ أو اكتب تفصيلك الخاص هنا..." class="hidden mt-2 w-full border-2 border-amber-400 bg-amber-50 rounded-xl px-4 py-3 outline-none" />
+
+<!-- 3 NOTES -->
+<label class="block text-sm font-bold mb-1 mt-4">3 - ملاحظات إضافية</label>
+<textarea id="notes" rows="3" placeholder="اكتب ما يدور في ذهنك... مثال: يجب أن أدفع الكراء قبل يوم الجمعة..." class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none"></textarea>
+
+<div class="mt-4 flex gap-3">
+<button onclick="addTask()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl">💾 حفظ الهمّ</button>
+<button onclick="clearInputs()" class="bg-slate-200 font-bold px-5 py-3 rounded-xl">مسح</button>
+</div>
+<p id="saveMsg" class="hidden text-center font-bold text-emerald-700 mt-2">✅ تم الحفظ بنجاح!</p>
+</div>
+
+<!-- FILTER -->
+<div class="flex flex-wrap gap-2 justify-between bg-white rounded-2xl p-4 shadow border mb-6">
+<div class="flex gap-2">
+<button onclick="filterTasks('all')" class="bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-full">الكل</button>
+<button onclick="filterTasks('done')" class="bg-white border text-sm font-bold px-4 py-2 rounded-full">✅ تم</button>
+<button onclick="filterTasks('pending')" class="bg-white border text-sm font-bold px-4 py-2 rounded-full">⏳ قيد الانتظار</button>
+</div>
+<div class="flex gap-2">
+<button onclick="window.print()" class="bg-slate-800 text-white text-sm font-bold px-4 py-2 rounded-xl">🖨️ طباعة / PDF</button>
+<button onclick="deleteAll()" class="bg-rose-100 text-rose-700 text-sm font-bold px-4 py-2 rounded-xl">🗑️ حذف الكل</button>
+</div>
+</div>
+
+<!-- LIST -->
+<div class="bg-white rounded-2xl shadow-lg p-6 border">
+<div class="flex justify-between"><h3 class="font-extrabold text-emerald-900">📋 قائمة همومي</h3><span id="countLabel" class="text-xs bg-emerald-100 px-3 py-1 rounded-full font-bold"></span></div>
+<div id="tasksList" class="space-y-4 mt-4"></div>
+<div id="emptyMsg" class="text-center py-10 text-slate-400"><div class="text-5xl mb-3">🌿</div><p class="font-bold">ذهنك صافٍ الآن</p><p class="text-sm">اكتب همّاً في الأعلى واحفظه</p></div>
+</div>
+</main>
+
+<script>
+// ===== قاعدة بيانات الهموم بالعربية =====
+const DATA = {
+"المال": ["دفع الكراء","دفع الفواتير","دفع الديون","ادخار المال","المصاريف اليومية","شراء الطعام","مصاريف السيارة","مصروف غير متوقع","راتب ضعيف","بدون عمل"],
+"الصحة": ["صداع","ألم في الظهر","الشعور بالتعب","موعد الطبيب","أخذ الدواء","الحاجة للرياضة","مشاكل النوم","القلق","التوتر","ألم الأسنان"],
+"العائلة": ["أطفالي","زوجتي / زوجي","والداي","زيارة عائلية","مشكلة عائلية","دراسة الأطفال","صحة الأطفال","مناسبة عائلية","رعاية الوالدين"],
+"العمل": ["تحضير الدرس","تصحيح الامتحانات","اجتماع مع المدير","موعد نهائي للعمل","ضغط العمل","مشروع جديد","التحدث مع زميل","وثائق العمل","التر
