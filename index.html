@@ -40,22 +40,23 @@ tr.done .note{text-decoration:line-through;opacity:.7}
 @media print{:root:root:root{--bg:#fff;--card:#fff;--ink:#000;--mute:#333;--line:#888;--done:#e8e8e8;color-scheme:light}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{background:#fff}main{max-width:none;padding:0}section.card:first-of-type,.bar button,.bar select,.bar label,.noprint{display:none!important}.card{border:0;padding:0}.sub{color:#333}table{min-width:0}.wrap{overflow:visible}td button{border:0;background:none;color:#000;padding:0}tr{break-inside:avoid}}
 </style>
 </head>
-  <a href="https://mashaallahtarbeyya-cpu.github.io/aitlahcen/" class="inline-block bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-all shadow">
-        ← العودة إلى الصفحة الرئيسية
-      </a>
 <body>
- <div style="position:fixed;top:0;right:0;left:0;z-index:100;background:#065f46;color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.2)">
+<a href="https://mashaallahtarbeyya-cpu.github.io/aitlahcen/" class="inline-block bg-slate-700 hover:bg-slate-800 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-all shadow">
+  ← العودة إلى الصفحة الرئيسية
+</a>
+<div style="position:fixed;top:0;right:0;left:0;z-index:100;background:#065f46;color:#fff;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;box-shadow:0 2px 10px rgba(0,0,0,.2)">
   <b style="font-size:13px">🤲 حصن المسلم</b>
   <div style="display:flex;gap:6px">
     <a href="https://mashaallahtarbeyya-cpu.github.io/aitlahcen/" style="background:#fff;color:#065f46;text-decoration:none;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:900">🏠 الأصلي</a>
     <a href="https://aitlahcenelhassan983-stack.github.io/bank.mashallah/" style="background:#f59e0b;color:#111;text-decoration:none;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:900">🌿 البنك</a>
   </div>
-</div> 
+</div>
 <main>
 <h1>مذكرة الهموم والأغراض والأهداف</h1>
 <p class="sub">صدقة جارية - سجّل ما يشغلك من خير، واربطه بما تحتاج إليه، ثم تتبّع إنجازه.</p>
 <p class="sub">هذه المذكرة لا تحفظ أسرارا، هي للمهام العامة النافعة فقط. لا تكتب فيها أرقاما بنكية ولا وثائق ولا أمورا خاصة.</p>
 <p class="stats" id="net"></p>
+<p class="sub" id="pd"></p>
 
 <section class="card">
 <div class="grid">
@@ -68,7 +69,7 @@ tr.done .note{text-decoration:line-through;opacity:.7}
 <select id="status"><option value="0">لم يتم</option><option value="1">تم</option></select></div>
 </div>
 <div style="margin-top:10px"><label for="note">تفاصيل (اختياري)</label>
-<textarea id="note" rows="2" placeholder="مثال: موعد الأسبوع القادم"></textarea></div>
+<textarea id="note" rows="2" placeholder="اكتب ما يناسبك"></textarea></div>
 <div class="bar"><button class="p" id="save">حفظ</button><button id="clear">تفريغ الحقول</button></div>
 </section>
 
@@ -88,30 +89,7 @@ tr.done .note{text-decoration:line-through;opacity:.7}
 <script>
 (function(){
 var KEY="mozakkira-sadaqa-v1",data=[];
-var SEED=[
-["روحي","مسجد","قراءة حزب من القرآن"],
-["روحي","مسجد","أذكار الصباح والمساء"],
-["روحي","مسجد","الباقيات الصالحات 100 مرة"],
-["روحي","مسجد","صدقة يومية ولو يسيرة"],
-["روحي","مسجد","الدعاء للوالدين"],
-["نفسي","أخرى","جلسة سكينة وتأمل"],
-["نفسي","أخرى","كتابة خاطرة طيبة"],
-["اجتماعي","زيارة قريب","زيارة قريب للصلة"],
-["اجتماعي","مكالمة هاتفية","مكالمة للاطمئنان على قريب"],
-["اجتماعي","أخرى","كلمة طيبة لجار"],
-["صحي","طبيب","موعد طبيب عام للاطمئنان"],
-["صحي","صيدلية","مراجعة أدوية البيت"],
-["مهني","أخرى","إنتاج صفحة «فضاء التلميذ» للنجاح في اللغة العربية"],
-["مهني","أخرى","تحضير درس اللغة العربية"],
-["مهني","أخرى","تصحيح أوراق المتعلمين"],
-["مهني","أخرى","تنظيم خريطة القسم"],
-["منزلي","سوق","الخضر والفواكه"],
-["منزلي","سوق","مواد غذائية أساسية"],
-["منزلي","صيانة","صيانة عامة للبيت"],
-["أخرى","أخرى","تنظيم الملفات"],
-["أخرى","أخرى","ترتيب المكتبة"]
-];
-function load(){try{var r=localStorage.getItem(KEY);data=r?JSON.parse(r):[]}catch(e){data=[]}if(!Array.isArray(data))data=[];var sd=null;try{sd=localStorage.getItem(KEY+"-seed1")}catch(e){}if(!sd){var t=Date.now();data=data.concat(SEED.map(function(a,i){return{id:t+i,type:a[0],item:a[1],note:a[2],done:false}}));store();try{localStorage.setItem(KEY+"-seed1","1")}catch(e){}}}
+function load(){try{var r=localStorage.getItem(KEY);data=r?JSON.parse(r):[]}catch(e){data=[]}if(!Array.isArray(data))data=[]}
 function store(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
 var $=function(i){return document.getElementById(i)};
 var item=$("item"),other=$("other");
